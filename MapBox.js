@@ -5,6 +5,22 @@ var ss = SpreadsheetApp.getActiveSpreadsheet(),
     settings = {};
     
 var geocoders = {
+    ogdWien: {
+      query: function(query, key) {
+        return 'http://data.wien.gv.at/daten/OGDAddressService.svc/GetAddressInfo?crs=EPSG:4326&Address=' + query;
+      },
+      parse: function(r) {
+        try {
+          return {
+            longitude: r.features[0].geometry.coordinates[0],
+            latitude: r.features[0].geometry.coordinates[1],
+            accuracy: "0"
+          }
+        } catch(e) {
+          return { longitude: '', latitude: '', accuracy: '' };
+        }
+      }
+    },    
     yahoo: {
       query: function(query, key) {
         return 'http://where.yahooapis.com/geocode?appid=' +
@@ -230,6 +246,7 @@ function gcDialog() {
   grid.setWidget(0, 1, app.createListBox()
     .setName('apiBox')
     .setId('apiBox')
+    .addItem('ogdWien')     
     .addItem('mapquest')
     .addItem('yahoo')
     .addItem('cicero'));
